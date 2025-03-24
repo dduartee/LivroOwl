@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="10dp"
     tools:context=".ui.avaliacao.AvaliarLivroFragment">
 
     <ScrollView
@@ -16,10 +18,10 @@
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="32dp" />
+                android:layout_height="88dp" />
 
             <TextView
-                android:id="@+id/textView"
+                android:id="@+id/nomeLivro"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/title_livro_avalicao"
@@ -30,23 +32,84 @@
                 android:layout_width="match_parent"
                 android:layout_height="32dp" />
 
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/avalia_o_geral" />
+
             <RatingBar
                 android:id="@+id/idRatingBarAvaliacao"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="#FFFFFF"
+                android:indeterminateTint="#E500FF"
                 android:numStars="5"
+                android:progressBackgroundTint="#FFECB3"
+                android:progressTint="#F9A825"
                 android:rating="0"
+                android:secondaryProgressTint="#E65100"
                 android:stepSize="0.5" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="33dp" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/coment_rio" />
 
             <EditText
                 android:id="@+id/idComentarioAvalicao"
                 android:layout_width="match_parent"
                 android:layout_height="142dp"
                 android:ems="10"
+                android:fontFamily="monospace"
                 android:hint="@string/hintComentarioText"
                 android:importantForAutofill="no"
                 android:inputType="text"
+                android:singleLine="false"
                 android:textAlignment="viewStart" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/likeButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="#2E7D32"
+                    android:insetLeft="20dp"
+                    android:insetRight="20dp"
+                    android:text="@string/like"
+                    app:icon="@drawable/baseline_sentiment_very_satisfied_24" />
+
+                <Button
+                    android:id="@+id/addToList"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="#1565C0"
+                    android:text="@string/adicionar_a_lista"
+                    app:icon="@drawable/baseline_bookmarks_24" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/submitAvaliacao"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:insetLeft="10dp"
+                android:insetRight="10dp"
+                android:text="@string/enviar"
+                app:icon="@drawable/baseline_arrow_forward_24"
+                app:iconGravity="end" />
         </LinearLayout>
     </ScrollView>
 
