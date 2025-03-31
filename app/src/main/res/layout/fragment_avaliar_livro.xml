@@ -21,7 +21,7 @@
                 android:layout_height="88dp" />
 
             <TextView
-                android:id="@+id/nomeLivro"
+                android:id="@+id/idNomeLivro"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/title_livro_avalicao"
@@ -91,7 +91,7 @@
                     app:icon="@drawable/baseline_sentiment_very_satisfied_24" />
 
                 <Button
-                    android:id="@+id/addToList"
+                    android:id="@+id/addToListButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -102,7 +102,7 @@
             </LinearLayout>
 
             <Button
-                android:id="@+id/submitAvaliacao"
+                android:id="@+id/submitAvaliacaoButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:insetLeft="10dp"

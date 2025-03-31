@@ -1,5 +1,8 @@
 package space.gaabe.mobile.livroowl.model;
 
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -10,16 +13,42 @@ public class Avaliacao {
     private float estrelas;
     private boolean isLike;
     private Date dataAvaliado;
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    public Avaliacao() {
+        this.setComentario("");
+        this.setEstrelas(0);
+        this.setLike(false);
+        this.setDataAvaliado(new Date());
+    }
 
+    public Avaliacao(JSONObject avaliacaoJSON) {
+        try {
+            this.setComentario(avaliacaoJSON.getString("comentario"));
+            this.setLike(avaliacaoJSON.getBoolean("liked"));
+            this.setEstrelas(avaliacaoJSON.getInt("estrelas"));
+            long timestampAvaliado = avaliacaoJSON.getLong("timestamp_avaliado");
+            this.setDataAvaliado(new Date(timestampAvaliado));
 
-    public Avaliacao() {}
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public JSONObject toJSON() {
+        JSONObject avaliacaoJSON = new JSONObject();
+        try {
+            avaliacaoJSON.put("comentario", this.getComentario());
+            avaliacaoJSON.put("liked", this.isLike());
+            avaliacaoJSON.put("estrelas", this.getEstrelas());
+            avaliacaoJSON.put("timestamp_avaliado", this.getTimestampAvaliado());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return avaliacaoJSON;
+    }
     public void setComentario(String comentario) {
         String comentarioLimpo = comentario.trim();
-        if (comentarioLimpo.length() > 0) {
-            this.comentario = comentarioLimpo;
-        } else {
-            this.comentario = "";
-        }
+        this.comentario = comentarioLimpo;
     }
     public void setEstrelas(float estrelas) {
         if (estrelas < 0.5) {
@@ -46,6 +75,12 @@ public class Avaliacao {
     }
     public Date getDataAvaliado() {
         return dataAvaliado;
+    }
+    public long getTimestampAvaliado() {
+        return dataAvaliado.getTime();
+    }
+    public String getDataAvaliadoString() {
+        return dateFormat.format(dataAvaliado);
     }
 
 }

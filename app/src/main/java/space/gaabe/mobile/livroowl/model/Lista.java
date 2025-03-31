@@ -6,10 +6,14 @@ import org.json.JSONObject;
 // o livro pode ser adicionado a uma lista com varios outros livros
 public class Lista {
     private String nome;
-    private Livro[] livros;
+    private Livro[] livros; // TODO: usar a biblioteca ArrayList
     private int qtdeLivros;
 
-
+    public Lista() {
+        this.nome = "";
+        this.livros = new Livro[0];
+        this.qtdeLivros = 0;
+    }
     public Lista(JSONObject listaJSON) {
         try {
             this.setNome(listaJSON.getString("nome"));
@@ -26,30 +30,52 @@ public class Lista {
         }
     }
 
+    public JSONObject toJSON() {
+        JSONObject listaJSON = new JSONObject();
 
-    public Lista() {
-        this.nome = "";
-        this.livros = new Livro[0];
-        this.qtdeLivros = 0;
-    }
-
-    public void addLivro(Livro livro) {
-        Livro[] novosLivros = new Livro[qtdeLivros + 1];
-        for (int i = 0; i < qtdeLivros; i++) {
-            novosLivros[i] = livros[i];
+        try {
+            listaJSON.put("nome", this.getNome());
+            listaJSON.put("qtdeLivros", this.getQtdeLivros());
+            JSONArray livrosArrayJSON = new JSONArray();
+            Livro[] livros = this.getLivros();
+            for (int i = 0; i < this.getQtdeLivros(); i++) {
+                JSONObject livroJSON = livros[i].toJSON();
+                livrosArrayJSON.put(livroJSON);
+            }
+            listaJSON.put("livros", livrosArrayJSON);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        novosLivros[qtdeLivros] = livro;
-        livros = novosLivros;
+        return listaJSON;
+    }
+    public void addLivro(Livro livro) {
+        int novaQtdeLivros = qtdeLivros + 1;
+        Livro[] newLivros = new Livro[novaQtdeLivros];
+        for (int i = 0; i < qtdeLivros; i++) {
+            newLivros[i] = livros[i];
+        }
+        newLivros[novaQtdeLivros] = livro;
+        qtdeLivros = novaQtdeLivros;
+        setLivros(newLivros);
     }
 
-    public void removeLivro(Livro livro) {
-        Livro[] novosLivros = new Livro[qtdeLivros-1];
+    public void removeLivro(Livro livroRemover) {
+        if (qtdeLivros == 0) {
+            throw new RuntimeException("Lista vazia");
+        }
+        int novaQtdeLivros = qtdeLivros - 1;
+        Livro[] newLivros = new Livro[novaQtdeLivros];
         for (int i = 0; i < qtdeLivros; i++) {
-            if(livro.getNome() != livros[i].getNome()) {
-                novosLivros[i] = livros[i];
+            Livro livro = livros[i];
+            // se for a ultima iteração e não conter o livro na lista
+            if(livroRemover.getNome() != livro.getNome()) {
+                newLivros[i] = livro;
+            } else if (i == novaQtdeLivros) {
+                throw new RuntimeException("Livro não encontrado na lista");
             }
         }
-        livros = novosLivros;
+        qtdeLivros = novaQtdeLivros;
+        setLivros(newLivros);
     }
 
     public String getNome() {

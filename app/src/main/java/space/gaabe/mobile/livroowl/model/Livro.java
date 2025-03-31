@@ -30,8 +30,6 @@ public class Livro {
         }
     }
 
-
-
     public JSONObject toJSON() {
         JSONObject livroJSON = new JSONObject();
         try {
