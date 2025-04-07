@@ -1,5 +1,6 @@
 package space.gaabe.mobile.livroowl.ui.avaliacao;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
@@ -11,23 +12,37 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import com.google.android.material.button.MaterialButton;
 import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.android.material.snackbar.Snackbar;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Date;
 
 import space.gaabe.mobile.livroowl.MainActivity;
 import space.gaabe.mobile.livroowl.R;
 import space.gaabe.mobile.livroowl.model.Avaliacao;
+import space.gaabe.mobile.livroowl.model.Livro;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link AvaliarLivroFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AvaliarLivroFragment extends Fragment implements View.OnClickListener{
+public class AvaliarLivroFragment extends Fragment implements View.OnClickListener, Response.ErrorListener, Response.Listener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -43,10 +58,15 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
     private TextView nomeLivro;
     private EditText comentarioAvalicao;
     private RatingBar ratingBarAvaliacao;
-    private Button likeButton;
+    private MaterialButton likeButton;
     private Button addToListButton;
     private Button submitAvaliacaoButton;
     Avaliacao avaliacao = new Avaliacao();
+    Livro livro = new Livro();
+
+    private RequestQueue requestQueue;
+    private JsonObjectRequest jsonObjectRequest;
+
 
     public AvaliarLivroFragment() {
         // Required empty public constructor
@@ -83,6 +103,7 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         this.view = inflater.inflate(R.layout.fragment_avaliar_livro, container, false);
+        // https://openlibrary.org/people/mekBot/books/want-to-read.json
 
         // binding
         this.comentarioAvalicao = view.findViewById(R.id.idComentarioAvalicao);
@@ -91,11 +112,57 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
         this.addToListButton = view.findViewById(R.id.addToListButton);
         this.submitAvaliacaoButton = view.findViewById(R.id.submitAvaliacaoButton);
         this.nomeLivro = view.findViewById(R.id.idNomeLivro);
-        this.nomeLivro.setText("A bruxa");
         this.likeButton.setOnClickListener(this);
         this.submitAvaliacaoButton.setOnClickListener(this);
-        // Inflate the layout for this fragment
+        this.requestQueue = Volley.newRequestQueue(view.getContext());
+        this.requestQueue.start();
+        JSONObject jsonObject = new JSONObject();
+        jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, "https://openlibrary.org/people/mekBot/books/want-to-read.json",
+                jsonObject, response -> {
+            try {
+                JSONObject JSONresponse = new JSONObject((response.toString()));
+                JSONArray readingLogEntries = JSONresponse.getJSONArray("reading_log_entries");
+
+                if (readingLogEntries.length() > 0) {
+                    // get random number between 0 and readingLogEntries.length()
+                    int randomIndex = (int) (Math.random() * readingLogEntries.length());
+                    JSONObject firstEntry = readingLogEntries.getJSONObject(randomIndex);
+                    JSONObject work = firstEntry.getJSONObject("work");
+                    String title = work.getString("title");
+                    this.nomeLivro.setText(title);
+                    JSONArray authors = work.getJSONArray("author_names");
+                    String author = authors.getString(0);
+                    this.livro.setAutor(author);
+                    Log.d("AvaliarLivroFragment", "Title of the first book: " + title);
+                } else {
+                    Log.w("AvaliarLivroFragment", "No reading log entries found.");
+                }
+            } catch (JSONException e) {
+                Log.e("AvaliarLivroFragment", "Error parsing JSON: " + e.getMessage());
+                throw new RuntimeException(e);
+            }
+        }, this);
+        jsonObjectRequest.setTag("GetWantToReadBooks");
+        requestQueue.add(jsonObjectRequest);
         return view;
+    }
+    private void handleLikeButton(boolean like) {
+        // objeto de negocio
+        avaliacao.setLike(!like);
+        if (!like) {
+            this.likeButton.setText("Liked");
+            this.likeButton.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.green));
+            this.likeButton.setIcon(ContextCompat.getDrawable(getContext(), R.drawable.baseline_sentiment_very_satisfied_24)); // Keep the satisfied icon
+        } else {
+            this.likeButton.setText("Disliked");
+            this.likeButton.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.red));
+            this.likeButton.setIcon(ContextCompat.getDrawable(getContext(), R.drawable.baseline_sentiment_very_dissatisfied_24)); // Change to a dissatisfied icon
+        }
+    }
+    private void resetLikeButton() {
+        this.likeButton.setText("Like");
+        this.likeButton.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.like_button_background));
+        this.likeButton.setIcon(ContextCompat.getDrawable(getContext(), R.drawable.baseline_sentiment_very_satisfied_24));
     }
 
     @Override
@@ -105,13 +172,7 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
         if(viewId == R.id.likeButton) {
             try {
                 boolean like = avaliacao.isLike();
-                // objeto de negocio
-                avaliacao.setLike(!like);
-                if (!like) {
-                    this.likeButton.setText("Liked");
-                } else {
-                    this.likeButton.setText("Disliked");
-                }
+                this.handleLikeButton(like);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -122,11 +183,42 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
                 avaliacao.setEstrelas(this.ratingBarAvaliacao.getRating());
                 avaliacao.setDataAvaliado(new Date());
 
-                Toast.makeText(view.getContext(), "Avaliado!", Toast.LENGTH_LONG).show();
+                this.jsonObjectRequest = new JsonObjectRequest(
+                        Request.Method.POST,
+                        "http://10.0.2.2:8080/avaliacoes",
+                        avaliacao.toJSON(), this, this);
+                requestQueue.add(jsonObjectRequest);
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
 
         }
+    }
+
+    @Override
+    public void onErrorResponse(VolleyError error) {
+        Snackbar messageErro = Snackbar.make(view.getContext(), view, "Opa! Ocorreu algum erro ao enviar a avaliação " + error.toString(), Snackbar.LENGTH_LONG);
+        messageErro.show();
+
+    }
+
+    @Override
+    public void onResponse(Object response) {
+        try {
+
+            JSONObject json = new JSONObject(response.toString());
+            CharSequence message = json.getString("id");
+            long timestampAvaliado = json.getLong("timestamp_avaliado");
+            if(timestampAvaliado > 0) {
+                this.resetLikeButton();
+                this.comentarioAvalicao.setText("");
+                this.ratingBarAvaliacao.setRating(0);
+                Toast.makeText(view.getContext(), "Avaliado!", Toast.LENGTH_LONG).show();
+            }
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }
