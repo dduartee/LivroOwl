@@ -27,4 +27,11 @@
         android:name="space.gaabe.mobile.livroowl.ui.avaliacao.AvaliarLivroFragment"
         android:label="@string/title_avaliacao"
         tools:layout="@layout/fragment_avaliar_livro" />
+    <fragment
+        android:id="@+id/navigation_consultar_avaliar_livro"
+        android:name="space.gaabe.mobile.livroowl.ui.avaliacao.ConsultaAvaliacaoFragment"
+        android:label="@string/title_consulta_avaliacao"
+        tools:layout="@layout/fragment_consulta_avaliacao_list" />
+
+
 </navigation>

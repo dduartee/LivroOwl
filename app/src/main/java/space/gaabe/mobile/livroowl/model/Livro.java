@@ -50,6 +50,7 @@ public class Livro {
      * @param avaliacao Classe avaliacao preenchida
      */
     public void avaliar(Avaliacao avaliacao) {
+        avaliacao.setNomeLivro(this.nome);
         int novaQtdeAvaliacoes = qtdeAvaliacoes + 1;
         float novasEstrelas = mediaAvaliacao * qtdeAvaliacoes+ avaliacao.getEstrelas();
         float novaMediaAvaliacao = novasEstrelas / novaQtdeAvaliacoes;

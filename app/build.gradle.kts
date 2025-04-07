@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "space.gaabe.mobile.livroowl"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "space.gaabe.mobile.livroowl"

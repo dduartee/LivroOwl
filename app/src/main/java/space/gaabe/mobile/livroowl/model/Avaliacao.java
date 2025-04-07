@@ -9,6 +9,16 @@ import java.util.Date;
  * Classe que representa uma avaliação, com um comentário, uma quantidade de estrelas, like e data
  */
 public class Avaliacao {
+    private String nomeLivro;
+
+    public String getNomeLivro() {
+        return nomeLivro;
+    }
+
+    public void setNomeLivro(String nomeLivro) {
+        this.nomeLivro = nomeLivro;
+    }
+
     private String comentario;
     private float estrelas;
     private boolean isLike;
@@ -28,6 +38,7 @@ public class Avaliacao {
             this.setEstrelas(avaliacaoJSON.getInt("estrelas"));
             long timestampAvaliado = avaliacaoJSON.getLong("timestamp_avaliado");
             this.setDataAvaliado(new Date(timestampAvaliado));
+            this.setNomeLivro(avaliacaoJSON.getString("nomeLivro"));
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -41,14 +52,14 @@ public class Avaliacao {
             avaliacaoJSON.put("liked", this.isLike());
             avaliacaoJSON.put("estrelas", this.getEstrelas());
             avaliacaoJSON.put("timestamp_avaliado", this.getTimestampAvaliado());
+            avaliacaoJSON.put("nomeLivro", this.getNomeLivro());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return avaliacaoJSON;
     }
     public void setComentario(String comentario) {
-        String comentarioLimpo = comentario.trim();
-        this.comentario = comentarioLimpo;
+        this.comentario = comentario.trim();
     }
     public void setEstrelas(float estrelas) {
         if (estrelas < 0.5) {

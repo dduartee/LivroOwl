@@ -10,10 +10,15 @@
         android:id="@+id/navigation_dashboard"
         android:icon="@drawable/ic_dashboard_black_24dp"
         android:title="@string/title_dashboard" />
+
     <item
         android:id="@+id/navigation_avaliar_livro"
         android:icon="@drawable/baseline_star_rate_24"
         android:title="@string/title_avaliacao" />
+    <item
+        android:id="@+id/navigation_consultar_avaliar_livro"
+        android:icon="@android:drawable/ic_menu_search"
+        android:title="@string/title_consulta_avaliacao" />
 
     <item
         android:id="@+id/navigation_notifications"

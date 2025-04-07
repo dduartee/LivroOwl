@@ -129,7 +129,8 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
                     JSONObject firstEntry = readingLogEntries.getJSONObject(randomIndex);
                     JSONObject work = firstEntry.getJSONObject("work");
                     String title = work.getString("title");
-                    this.nomeLivro.setText(title);
+                    this.livro.setNome(title);
+                    this.avaliacao.setNomeLivro(title);
                     JSONArray authors = work.getJSONArray("author_names");
                     String author = authors.getString(0);
                     this.livro.setAutor(author);
@@ -144,6 +145,7 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
         }, this);
         jsonObjectRequest.setTag("GetWantToReadBooks");
         requestQueue.add(jsonObjectRequest);
+        this.nomeLivro.setText(this.avaliacao.getNomeLivro());
         return view;
     }
     private void handleLikeButton(boolean like) {
@@ -182,7 +184,6 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
                 avaliacao.setComentario(this.comentarioAvalicao.getText().toString());
                 avaliacao.setEstrelas(this.ratingBarAvaliacao.getRating());
                 avaliacao.setDataAvaliado(new Date());
-
                 this.jsonObjectRequest = new JsonObjectRequest(
                         Request.Method.POST,
                         "http://10.0.2.2:8080/avaliacoes",
