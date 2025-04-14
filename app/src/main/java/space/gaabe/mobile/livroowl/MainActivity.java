@@ -30,7 +30,8 @@ public class MainActivity extends AppCompatActivity {
                 R.id.navigation_home,
                 R.id.navigation_dashboard,
                 R.id.navigation_notifications,
-                R.id.navigation_avaliar_livro
+                R.id.navigation_avaliar_livro,
+                R.id.navigation_consultar_avaliar_livro
                 )
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);

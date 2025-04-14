@@ -6,12 +6,33 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Livro {
+    private String id;
+
+    public String getId() {
+        return this.id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getCapaId() {
+        return this.capaId;
+    }
+
+    public void setCapaId(String capaId) {
+        this.capaId = capaId;
+    }
+
+    private String capaId;
     private String nome;
     private String autor;
     private String genero;
     private int qtdeAvaliacoes;
     private float mediaAvaliacao;
     public Livro() {
+        this.setId("");
+        this.setCapaId("");
         this.setNome("");
         this.setAutor("");
         this.setGenero("");
@@ -21,6 +42,8 @@ public class Livro {
     public Livro(JSONObject livroJSON) {
         try {
             this.setNome(livroJSON.getString("nome"));
+            this.setCapaId(livroJSON.getString("capaId"));
+            this.setId(livroJSON.getString("id"));
             this.setAutor(livroJSON.getString("autor"));
             this.setGenero(livroJSON.getString("genero"));
             this.setQtdeAvaliacoes(livroJSON.getInt("qtdeAvaliacoes"));
@@ -34,6 +57,8 @@ public class Livro {
         JSONObject livroJSON = new JSONObject();
         try {
             livroJSON.put("nome", this.getNome());
+            livroJSON.put("capaId", this.getCapaId());
+            livroJSON.put("id", this.getId());
             livroJSON.put("autor", this.getAutor());
             livroJSON.put("genero", this.getGenero());
             livroJSON.put("qtdeAvaliacoes", this.getQtdeAvaliacoes());

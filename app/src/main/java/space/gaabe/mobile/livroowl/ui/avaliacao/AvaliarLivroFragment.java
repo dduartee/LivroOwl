@@ -1,6 +1,7 @@
 package space.gaabe.mobile.livroowl.ui.avaliacao;
 
-import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
@@ -12,8 +13,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,9 +34,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Date;
 
-import space.gaabe.mobile.livroowl.MainActivity;
 import space.gaabe.mobile.livroowl.R;
 import space.gaabe.mobile.livroowl.model.Avaliacao;
 import space.gaabe.mobile.livroowl.model.Lista;
@@ -57,6 +65,7 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
     private View view;
 
     private TextView nomeLivro;
+    private ImageView capaLivro;
     private EditText comentarioAvalicao;
     private RatingBar ratingBarAvaliacao;
     private MaterialButton likeButton;
@@ -100,7 +109,6 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -114,6 +122,7 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
         this.addToListButton = view.findViewById(R.id.addToListButton);
         this.submitAvaliacaoButton = view.findViewById(R.id.submitAvaliacaoButton);
         this.nomeLivro = view.findViewById(R.id.idNomeLivro);
+        this.capaLivro = view.findViewById(R.id.CoverImageView);
 
         this.likeButton.setOnClickListener(this);
         this.addToListButton.setOnClickListener(this);
@@ -122,6 +131,19 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
         // request do livro
         this.requestQueue = Volley.newRequestQueue(view.getContext());
         this.requestQueue.start();
+        fetchLivro();
+        // this.nomeLivro.setText(this.livro.getNome());
+        this.lista.setNome("Minha lista");
+        return view;
+    }
+    private void handleResetAvaliacao() {
+        this.resetLikeButton();
+        this.addToListButton.setClickable(true);
+        this.comentarioAvalicao.setText("");
+        this.ratingBarAvaliacao.setRating(0);
+    }
+    private void fetchLivro() {
+        handleResetAvaliacao();
         JSONObject jsonObject = new JSONObject();
         jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, "https://openlibrary.org/people/mekBot/books/want-to-read.json",
                 jsonObject, response -> {
@@ -136,8 +158,14 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
                     JSONObject work = firstEntry.getJSONObject("work");
                     String title = work.getString("title");
                     this.livro.setNome(title);
+                    this.livro.setCapaId(work.getString("cover_id"));
                     this.avaliacao.setNomeLivro(title);
                     this.nomeLivro.setText(title);
+                    String coverURL = "https://covers.openlibrary.org/b/id/" + this.livro.getCapaId() + "-M.jpg";
+                    Log.d("AvaliarLivroFragment", "Cover URL: " + coverURL);
+                    Glide.with(getContext())
+                            .load(coverURL)
+                            .into(capaLivro);
                     JSONArray authors = work.getJSONArray("author_names");
                     String author = authors.getString(0);
                     this.livro.setAutor(author);
@@ -152,10 +180,8 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
         }, this);
         jsonObjectRequest.setTag("GetWantToReadBooks");
         requestQueue.add(jsonObjectRequest);
-        // this.nomeLivro.setText(this.livro.getNome());
-        this.lista.setNome("Minha lista");
-        return view;
     }
+
     private void handleLikeButton() {
         // objeto de negocio
         avaliacao.setLike(true);
@@ -223,21 +249,19 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
     public void onErrorResponse(VolleyError error) {
         Snackbar messageErro = Snackbar.make(view.getContext(), view, "Opa! Ocorreu algum erro ao enviar a avaliação " + error.toString(), Snackbar.LENGTH_LONG);
         messageErro.show();
-
+        fetchLivro();
     }
 
     @Override
     public void onResponse(Object response) {
+        fetchLivro();
         try {
 
             JSONObject json = new JSONObject(response.toString());
             CharSequence message = json.getString("id");
             long timestampAvaliado = json.getLong("timestamp_avaliado");
             if(timestampAvaliado > 0) {
-                this.resetLikeButton();
-                this.addToListButton.setClickable(true);
-                this.comentarioAvalicao.setText("");
-                this.ratingBarAvaliacao.setRating(0);
+                this.handleResetAvaliacao();
                 Toast.makeText(view.getContext(), "Avaliado!", Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
