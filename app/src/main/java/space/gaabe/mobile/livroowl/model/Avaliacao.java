@@ -1,5 +1,7 @@
 package space.gaabe.mobile.livroowl.model;
 
+import android.util.Log;
+
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
@@ -12,7 +14,7 @@ public class Avaliacao {
     private String nomeLivro;
 
     public String getNomeLivro() {
-        return nomeLivro;
+        return this.nomeLivro;
     }
 
     public void setNomeLivro(String nomeLivro) {

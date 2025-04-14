@@ -11,5 +11,7 @@
     <color name="red">#F44336</color>
     <color name="blue">#0288D1</color>
     <color name="like_button_background">#0288D1</color>
+    <color name="addToList_button_background">#1565C0</color>
+    <color name="addToList_button_text_added">#cccccc</color>
 
 </resources>

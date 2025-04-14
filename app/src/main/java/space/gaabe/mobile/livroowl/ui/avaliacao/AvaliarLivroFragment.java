@@ -35,6 +35,7 @@ import java.util.Date;
 import space.gaabe.mobile.livroowl.MainActivity;
 import space.gaabe.mobile.livroowl.R;
 import space.gaabe.mobile.livroowl.model.Avaliacao;
+import space.gaabe.mobile.livroowl.model.Lista;
 import space.gaabe.mobile.livroowl.model.Livro;
 
 /**
@@ -59,10 +60,11 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
     private EditText comentarioAvalicao;
     private RatingBar ratingBarAvaliacao;
     private MaterialButton likeButton;
-    private Button addToListButton;
+    private MaterialButton addToListButton;
     private Button submitAvaliacaoButton;
     Avaliacao avaliacao = new Avaliacao();
     Livro livro = new Livro();
+    Lista lista = new Lista();
 
     private RequestQueue requestQueue;
     private JsonObjectRequest jsonObjectRequest;
@@ -112,8 +114,12 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
         this.addToListButton = view.findViewById(R.id.addToListButton);
         this.submitAvaliacaoButton = view.findViewById(R.id.submitAvaliacaoButton);
         this.nomeLivro = view.findViewById(R.id.idNomeLivro);
+
         this.likeButton.setOnClickListener(this);
+        this.addToListButton.setOnClickListener(this);
         this.submitAvaliacaoButton.setOnClickListener(this);
+
+        // request do livro
         this.requestQueue = Volley.newRequestQueue(view.getContext());
         this.requestQueue.start();
         JSONObject jsonObject = new JSONObject();
@@ -131,6 +137,7 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
                     String title = work.getString("title");
                     this.livro.setNome(title);
                     this.avaliacao.setNomeLivro(title);
+                    this.nomeLivro.setText(title);
                     JSONArray authors = work.getJSONArray("author_names");
                     String author = authors.getString(0);
                     this.livro.setAutor(author);
@@ -145,36 +152,43 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
         }, this);
         jsonObjectRequest.setTag("GetWantToReadBooks");
         requestQueue.add(jsonObjectRequest);
-        this.nomeLivro.setText(this.avaliacao.getNomeLivro());
+        // this.nomeLivro.setText(this.livro.getNome());
+        this.lista.setNome("Minha lista");
         return view;
     }
-    private void handleLikeButton(boolean like) {
+    private void handleLikeButton() {
         // objeto de negocio
-        avaliacao.setLike(!like);
-        if (!like) {
-            this.likeButton.setText("Liked");
-            this.likeButton.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.green));
-            this.likeButton.setIcon(ContextCompat.getDrawable(getContext(), R.drawable.baseline_sentiment_very_satisfied_24)); // Keep the satisfied icon
-        } else {
-            this.likeButton.setText("Disliked");
-            this.likeButton.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.red));
-            this.likeButton.setIcon(ContextCompat.getDrawable(getContext(), R.drawable.baseline_sentiment_very_dissatisfied_24)); // Change to a dissatisfied icon
-        }
+        avaliacao.setLike(true);
+        this.likeButton.setText("Liked");
+        this.likeButton.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.green));
+        this.likeButton.setIcon(ContextCompat.getDrawable(getContext(), R.drawable.baseline_sentiment_very_satisfied_24)); // Keep the satisfied icon
+        this.likeButton.setClickable(false);
+        this.likeButton.setTextColor(ContextCompat.getColor(getContext(), R.color.addToList_button_text_added));
+
     }
     private void resetLikeButton() {
         this.likeButton.setText("Like");
         this.likeButton.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.like_button_background));
         this.likeButton.setIcon(ContextCompat.getDrawable(getContext(), R.drawable.baseline_sentiment_very_satisfied_24));
+        this.likeButton.setClickable(true);
+    }
+    private void handleAddToListButton() {
+        // this.addToListButton.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.green));
+        this.addToListButton.setText("Adicionado");
+        // this.addToListButton.setEnabled(false);
+        this.addToListButton.setClickable(false);
+        this.addToListButton.setTextColor(ContextCompat.getColor(getContext(), R.color.addToList_button_text_added));
+        this.addToListButton.setIcon(ContextCompat.getDrawable(getContext(), R.drawable.outline_bookmark_added_24));
     }
 
     @Override
     public void onClick(View view) {
         int viewId = view.getId();
-
+        Log.d("AvaliarLivroFragment", "Botão clicado: " + viewId);
+        Log.d("AvaliarLivroFragment", "addToListId: " + R.id.addToListButton);
         if(viewId == R.id.likeButton) {
             try {
-                boolean like = avaliacao.isLike();
-                this.handleLikeButton(like);
+                this.handleLikeButton();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -193,7 +207,15 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-
+        } else if(viewId == R.id.addToListButton) {
+            try {
+                Log.d("AvaliarLivroFragment", "Livro adicionado à lista: " + this.livro.getNome());
+                // this.lista.addLivro(this.livro);
+                Toast.makeText(view.getContext(), "Livro adicionado a lista!", Toast.LENGTH_LONG).show();
+                this.handleAddToListButton();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -213,6 +235,7 @@ public class AvaliarLivroFragment extends Fragment implements View.OnClickListen
             long timestampAvaliado = json.getLong("timestamp_avaliado");
             if(timestampAvaliado > 0) {
                 this.resetLikeButton();
+                this.addToListButton.setClickable(true);
                 this.comentarioAvalicao.setText("");
                 this.ratingBarAvaliacao.setRating(0);
                 Toast.makeText(view.getContext(), "Avaliado!", Toast.LENGTH_LONG).show();

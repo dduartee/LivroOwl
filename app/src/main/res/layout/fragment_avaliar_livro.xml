@@ -18,7 +18,7 @@
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="88dp" />
+                android:layout_height="45dp" />
 
             <TextView
                 android:id="@+id/idNomeLivro"
@@ -88,15 +88,15 @@
                     android:insetLeft="20dp"
                     android:insetRight="20dp"
                     android:text="@string/like"
-                    app:icon="@drawable/baseline_sentiment_very_satisfied_24"
+                    app:icon="@drawable/baseline_sentiment_neutral_24"
                     app:cornerRadius="8dp"/>
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/addToListButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:backgroundTint="#1565C0"
+                    android:backgroundTint="@color/addToList_button_background"
                     android:text="@string/adicionar_a_lista"
                     app:icon="@drawable/baseline_bookmarks_24" />
 
